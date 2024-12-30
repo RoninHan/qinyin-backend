@@ -1,0 +1,10 @@
+[package]
+name = "qiyin-backend"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = [".", "api", "service", "entity", "migration"]
+
+[dependencies]
+rbac-api = { path = "api" }
