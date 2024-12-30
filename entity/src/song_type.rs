@@ -1,15 +1,15 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
+// 歌曲類型表
+
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize, Deserialize)]
-#[sea_orm(table_name = "permission")]
+#[sea_orm(table_name = "song_type")]
 pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
     pub id: i64,
-    pub title: String,
-    pub action: String,
-    pub status: String,
+    pub name: String,
     pub created_at: DateTime,
     pub updated_at: DateTime,
 }
