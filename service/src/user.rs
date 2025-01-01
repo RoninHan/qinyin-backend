@@ -10,16 +10,11 @@ impl UserServices {
     ) -> Result<user::ActiveModel, DbErr> {
         user::ActiveModel {
             name: Set(form_data.name.to_owned()),
-            email: Set(form_data.email.to_owned()),
-            password: Set(form_data.password.to_owned()),
-            id_card: Set(form_data.id_card.to_owned()),
             sex: Set(form_data.sex.to_owned()),
+            email: Set(form_data.email.to_owned()),
+            app_id: Set(form_data.app_id.to_owned()),
             phone: Set(form_data.phone.to_owned()),
-            status: Set(String::from("active")),
-            description: Set(form_data.description.to_owned()),
-            job_number: Set(form_data.job_number.to_owned()),
             birthday: Set(form_data.birthday),
-            department_id: Set(form_data.department_id),
             created_at: Set(chrono::Utc::now().naive_utc()),
             updated_at: Set(chrono::Utc::now().naive_utc()),
             ..Default::default()
@@ -43,14 +38,10 @@ impl UserServices {
             id: user.id,
             name: Set(form_data.name.to_owned()),
             email: Set(form_data.email.to_owned()),
-            password: Set(form_data.password.to_owned()),
-            id_card: Set(form_data.id_card.to_owned()),
+            app_id: Set(form_data.app_id.to_owned()),
             sex: Set(form_data.sex.to_owned()),
             phone: Set(form_data.phone.to_owned()),
-            description: Set(form_data.description.to_owned()),
-            job_number: Set(form_data.job_number.to_owned()),
             birthday: Set(form_data.birthday),
-            department_id: Set(form_data.department_id),
             updated_at: Set(chrono::Utc::now().naive_utc()),
             ..Default::default()
         }

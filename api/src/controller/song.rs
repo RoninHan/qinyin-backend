@@ -1,20 +1,20 @@
 use crate::tools::{AppState, FlashData, Params};
 use service::{
-    Query as QueryCore, RolePermissionServices,
+    Query as QueryCore, SongService,
 };
 use axum::{
     response::Html,
-    extract::{Form, Query, State},
+    extract::{Form, Path, Query, State},
     http::StatusCode
 };
 use tower_cookies::{ Cookies};
 use crate::flash::{get_flash_cookie, post_response, PostResponse};
-use entity::role_permission;
+use entity::song;
 
-pub struct RolePermissionController;
+pub struct SongController;
 
-impl RolePermissionController {
-    pub async fn list_role_permissions(
+impl SongController{
+    pub async fn list_songs(
         state: State<AppState>,
         Query(params): Query<Params>,
         cookies: Cookies,
@@ -22,12 +22,12 @@ impl RolePermissionController {
         let page = params.page.unwrap_or(1);
         let posts_per_page = params.posts_per_page.unwrap_or(5);
 
-        let (posts, num_pages) = QueryCore::find_posts_in_page(&state.conn, page, posts_per_page)
+        let (songs, num_pages) = SongService::find_song(&state.conn, page, posts_per_page)
             .await
             .expect("Cannot find posts in page");
 
         let mut ctx = tera::Context::new();
-        ctx.insert("posts", &posts);
+        ctx.insert("songs", &possongsts);
         ctx.insert("page", &page);
         ctx.insert("posts_per_page", &posts_per_page);
         ctx.insert("num_pages", &num_pages);
@@ -44,45 +44,61 @@ impl RolePermissionController {
         Ok(Html(body))
     }
 
-    pub async fn create_role_permission(
+    pub async fn create_song(
         state: State<AppState>,
         mut cookies: Cookies,
-        form: Form<role_permission::Model>,
+        form: Form<song::Model>,
     ) -> Result<PostResponse, (StatusCode, &'static str)> {
         let form = form.0;
 
-        RolePermissionServices::create_role_permission(&state.conn, form)
-            .await
-            .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Failed to create role permission"))?;
+        SongService::create_song(&state.conn, form)
+        .await
+        .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Failed to create song"))?;
 
         Ok(post_response(
             &mut cookies,
             FlashData {
-                kind: "success".to_string(),
-                message: "Post created successfully".to_string(),
+                message: "Song created successfully".to_owned(),
             },
         ))
     }
 
-    
-
-    pub async fn delete_role_permission(
+    pub async fn update_song(
         state: State<AppState>,
+        Path(id): Path<i64>,
         mut cookies: Cookies,
-        form: Form<role_permission::Model>,
+        form: Form<song::Model>,
     ) -> Result<PostResponse, (StatusCode, &'static str)> {
         let form = form.0;
 
-        RolePermissionServices::delete_role_permission_by_id(&state.conn, form.id)
-            .await
-            .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Failed to delete role permission"))?;
+        SongService::update_song_by_id(&state.conn, id, form)
+        .await
+        .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Failed to update song"))?;
 
         Ok(post_response(
             &mut cookies,
             FlashData {
-                kind: "success".to_string(),
-                message: "Post deleted successfully".to_string(),
+                message: "Song updated successfully".to_owned(),
             },
         ))
     }
+
+    pub async fn delete_song(
+        state: State<AppState>,
+        Path(id): Path<i64>,
+        mut cookies: Cookies,
+    ) -> Result<PostResponse, (StatusCode, &'static str)> {
+        SongService::delete_song(&state.conn, id)
+        .await
+        .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Failed to delete song"))?;
+
+        Ok(post_response(
+            &mut cookies,
+            FlashData {
+                message: "Song deleted successfully".to_owned(),
+            },
+        ))
+    }
+
+
 }

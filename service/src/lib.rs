@@ -1,17 +1,19 @@
-mod mutation;
-mod permission;
-mod query;
-mod role;
-mod role_permission;
 mod user;
-mod user_role;
+mod creation;
+mod collect;
+mod friends;
+mod score;
+mod song;
+mod lyrics;
+mod song_type;
 
-pub use mutation::*;
-pub use permission::*;
-pub use query::*;
-pub use role::*;
-pub use role_permission::*;
 pub use user::*;
-pub use user_role::*;
+pub use creation::*;
+pub use collect::*;
+pub use friends::*;
+pub use score::*;
+pub use song::*;
+pub use lyrics::*;
+pub use song_type::*;
 
 pub use sea_orm;
