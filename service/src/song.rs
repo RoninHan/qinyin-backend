@@ -4,7 +4,10 @@ use sea_orm::*;
 pub struct SongService;
 
 impl SongService {
-    pub async fn create_song(db: &DbConn, form_data: song::Model) -> Result<song::ActiveModel, DbErr> {
+    pub async fn create_song(
+        db: &DbConn,
+        form_data: song::Model,
+    ) -> Result<song::ActiveModel, DbErr> {
         song::ActiveModel {
             name: Set(form_data.name.to_owned()),
             singer: Set(form_data.singer.to_owned()),
@@ -19,7 +22,11 @@ impl SongService {
         .await
     }
 
-    pub async fn update_song_by_id(db: &DbConn, id: i64, form_data: song::Model) -> Result<song::Model, DbErr> {
+    pub async fn update_song_by_id(
+        db: &DbConn,
+        id: i64,
+        form_data: song::Model,
+    ) -> Result<song::Model, DbErr> {
         let song: song::ActiveModel = Song::find_by_id(id)
             .one(db)
             .await?
@@ -54,12 +61,19 @@ impl SongService {
         Song::find_by_id(id).one(db).await
     }
 
-    pub async fn find_song(db: &DbConn,page: u64,posts_per_page: u64) -> Result<Vec<song::Model>, DbErr> {
+    pub async fn find_song(
+        db: &DbConn,
+        page: u64,
+        per_page: u64,
+    ) -> Result<Vec<song::Model>, DbErr> {
         let paginator = Song::find()
             .order_by_asc(song::Column::Id)
-            .paginate(db, posts_per_page);
+            .paginate(db, per_page);
         let num_pages = paginator.num_pages().await?;
 
-        paginator.fetch_page(page - 1).await.map(|page| (page,num_pages))
+        paginator
+            .fetch_page(page - 1)
+            .await
+            .map(|page| (page, num_pages))
     }
 }

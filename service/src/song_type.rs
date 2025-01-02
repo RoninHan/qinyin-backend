@@ -1,10 +1,13 @@
-use ::entity::{song_type,song_type::Entity as SongType};
+use ::entity::{song_type, song_type::Entity as SongType};
 use sea_orm::*;
 
 pub struct SongTypeService;
 
-impl SongTypeService{
-    pub async fn create_song_type(db: &DbConn, form_data: song_type::Model) -> Result<song_type::ActiveModel, DbErr> {
+impl SongTypeService {
+    pub async fn create_song_type(
+        db: &DbConn,
+        form_data: song_type::Model,
+    ) -> Result<song_type::ActiveModel, DbErr> {
         song_type::ActiveModel {
             name: Set(form_data.name.to_owned()),
             created_at: Set(chrono::Utc::now().naive_utc()),
@@ -13,10 +16,13 @@ impl SongTypeService{
         }
         .save(db)
         .await
-
     }
 
-    pub async fn update_song_type_by_id(db: &DbConn, id: i64, form_data: song_type::Model) -> Result<song_type::Model, DbErr> {
+    pub async fn update_song_type_by_id(
+        db: &DbConn,
+        id: i64,
+        form_data: song_type::Model,
+    ) -> Result<song_type::Model, DbErr> {
         let song_type: song_type::ActiveModel = SongType::find_by_id(id)
             .one(db)
             .await?
@@ -43,7 +49,19 @@ impl SongTypeService{
         song_type.delete(db).await
     }
 
-    pub async fn find_song_type(db: &DbConn)-> Result<Vec<song_type::Model>, DbErr>{
-        SongType::find().all(db).await
+    pub async fn find_song_type(
+        db: &DbConn,
+        page: u64,
+        per_page: u64,
+    ) -> Result<Vec<song_type::Model>, DbErr> {
+        let paginator = SongType::find()
+            .order_by_asc(song_type::Column::Id)
+            .paginate(db, per_page);
+        let num_pages = paginator.num_pages().await?;
+
+        paginator
+            .fetch_page(page - 1)
+            .await
+            .map(|page| (page, num_pages))
     }
 }
