@@ -1,7 +1,7 @@
 use crate::flash::{get_flash_cookie, post_response, PostResponse};
-use crate::tools::{AppState, FlashData, Params};
+use crate::tools::{AppState, FlashData};
 use axum::{
-    extract::{Form, Path, Query, State},
+    extract::{Form, Path, State},
     http::StatusCode,
     response::Html,
 };
@@ -14,10 +14,9 @@ pub struct LyricsController;
 impl LyricsController {
     pub async fn list_lyrics(
         state: State<AppState>,
-        Query(params): Query<Params>,
         cookies: Cookies,
     ) -> Result<Html<String>, (StatusCode, &'static str)> {
-        let (lyrics) = LyricsService::find_lyrics(&state.conn)
+        let lyrics = LyricsService::find_lyrics(&state.conn)
             .await
             .expect("Cannot find lyrics in page");
 

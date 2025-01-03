@@ -6,7 +6,7 @@ use axum::{
     response::Html,
 };
 use entity::song;
-use service::{ SongService};
+use service::SongService;
 use tower_cookies::Cookies;
 
 pub struct SongController;

@@ -1,7 +1,7 @@
 use crate::flash::{get_flash_cookie, post_response, PostResponse};
-use crate::tools::{AppState, FlashData, Params};
+use crate::tools::{AppState, FlashData};
 use axum::{
-    extract::{Form, Path, Query, State},
+    extract::{Form, Path, State},
     http::StatusCode,
     response::Html,
 };
@@ -14,13 +14,9 @@ pub struct CreationController;
 impl CreationController {
     pub async fn list_creations(
         state: State<AppState>,
-        Query(params): Query<Params>,
         cookies: Cookies,
     ) -> Result<Html<String>, (StatusCode, &'static str)> {
-        let page = params.page.unwrap_or(1);
-        let posts_per_page = params.posts_per_page.unwrap_or(5);
-
-        let (creations) = CreationService::find_creation(&state.conn)
+        let creations = CreationService::find_creation(&state.conn)
             .await
             .expect("Cannot find posts in page");
 

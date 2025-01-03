@@ -1,12 +1,11 @@
 use crate::tools::{AppState, FlashData, Params};
-use service::{ UserServices,
-};
+use service::UserServices;
 use axum::{
     response::Html,
     extract::{Form, Path, Query, State},
     http::StatusCode
 };
-use tower_cookies::{ Cookies};
+use tower_cookies:: Cookies;
 use crate::flash::{get_flash_cookie, post_response, PostResponse};
 use entity::user;
 

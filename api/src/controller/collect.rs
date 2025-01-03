@@ -1,7 +1,7 @@
 use crate::flash::{get_flash_cookie, post_response, PostResponse};
-use crate::tools::{AppState, FlashData, Params};
+use crate::tools::{AppState, FlashData};
 use axum::{
-    extract::{Form, Path, Query, State},
+    extract::{Form, State},
     http::StatusCode,
     response::Html,
 };
@@ -14,10 +14,9 @@ pub struct CollectController;
 impl CollectController {
     pub async fn list_collects(
         state: State<AppState>,
-        Query(params): Query<Params>,
         cookies: Cookies,
     ) -> Result<Html<String>, (StatusCode, &'static str)> {
-        let (collects) = CollectService::find_collect(&state.conn)
+        let collects = CollectService::find_collect(&state.conn)
             .await
             .expect("Cannot find posts in page");
 
