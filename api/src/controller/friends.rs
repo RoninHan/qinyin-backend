@@ -1,6 +1,5 @@
 use crate::flash::{get_flash_cookie, post_response, PostResponse};
 use crate::tools::{AppState, FlashData, Params};
-use anyhow::Ok;
 use axum::{
     extract::{Form, Path, Query, State},
     http::StatusCode,
@@ -72,7 +71,7 @@ impl FriendsController {
     ) -> Result<PostResponse, (StatusCode, &'static str)> {
         let form = form.0;
 
-        FriendsService::update_friends(&state.conn, id, form)
+        FriendsService::update_friends_by_id(&state.conn, id, form)
             .await
             .map_err(|_| {
                 (

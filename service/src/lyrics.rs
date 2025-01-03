@@ -7,7 +7,7 @@ impl LyricsService {
     pub async fn create_lyrics(db: &DbConn,form_data: lyrics::Model) -> Result<lyrics::ActiveModel, DbErr> {
         lyrics::ActiveModel {
             song_id: Set(form_data.song_id),
-            content: Set(form_data.content.to_owned()),
+            lyrics: Set(form_data.lyrics.to_owned()),
             created_at: Set(chrono::Utc::now().naive_utc()),
             updated_at: Set(chrono::Utc::now().naive_utc()),
             ..Default::default()
@@ -26,7 +26,7 @@ impl LyricsService {
         lyrics::ActiveModel {
             id: lyrics.id,
             song_id: Set(form_data.song_id),
-            content: Set(form_data.content.to_owned()),
+            lyrics: Set(form_data.lyrics.to_owned()),
             updated_at: Set(chrono::Utc::now().naive_utc()),
             ..Default::default()
         }

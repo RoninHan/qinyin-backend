@@ -1,6 +1,5 @@
 use crate::tools::{AppState, FlashData, Params};
-use service::{
-    Query as QueryCore, UserServices,
+use service::{ UserServices,
 };
 use axum::{
     response::Html,
@@ -22,7 +21,7 @@ impl UserController {
         let page = params.page.unwrap_or(1);
         let posts_per_page = params.posts_per_page.unwrap_or(5);
 
-        let (posts, num_pages) = QueryCore::find_posts_in_page(&state.conn, page, posts_per_page)
+        let (posts, num_pages) = UserServices::find_user(&state.conn, page, posts_per_page)
             .await
             .expect("Cannot find posts in page");
 

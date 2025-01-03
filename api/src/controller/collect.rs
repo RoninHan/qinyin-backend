@@ -1,6 +1,5 @@
 use crate::flash::{get_flash_cookie, post_response, PostResponse};
 use crate::tools::{AppState, FlashData, Params};
-use anyhow::Ok;
 use axum::{
     extract::{Form, Path, Query, State},
     http::StatusCode,
@@ -18,9 +17,6 @@ impl CollectController {
         Query(params): Query<Params>,
         cookies: Cookies,
     ) -> Result<Html<String>, (StatusCode, &'static str)> {
-        let page = params.page.unwrap_or(1);
-        let posts_per_page = params.posts_per_page.unwrap_or(5);
-
         let (collects) = CollectService::find_collect(&state.conn)
             .await
             .expect("Cannot find posts in page");

@@ -17,12 +17,9 @@ impl LyricsController {
         Query(params): Query<Params>,
         cookies: Cookies,
     ) -> Result<Html<String>, (StatusCode, &'static str)> {
-        let page = params.page.unwrap_or(1);
-        let posts_per_page = params.posts_per_page.unwrap_or(5);
-
         let (lyrics) = LyricsService::find_lyrics(&state.conn)
             .await
-            .expect("Cannot find posts in page");
+            .expect("Cannot find lyrics in page");
 
         let mut ctx = tera::Context::new();
         ctx.insert("lyrics", &lyrics);

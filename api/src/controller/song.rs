@@ -6,7 +6,7 @@ use axum::{
     response::Html,
 };
 use entity::song;
-use service::{Query as QueryCore, SongService};
+use service::{ SongService};
 use tower_cookies::Cookies;
 
 pub struct SongController;
@@ -25,7 +25,7 @@ impl SongController {
             .expect("Cannot find posts in page");
 
         let mut ctx = tera::Context::new();
-        ctx.insert("songs", &possongsts);
+        ctx.insert("songs", &songs);
         ctx.insert("page", &page);
         ctx.insert("posts_per_page", &posts_per_page);
         ctx.insert("num_pages", &num_pages);

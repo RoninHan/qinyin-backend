@@ -1,6 +1,5 @@
 use crate::flash::{get_flash_cookie, post_response, PostResponse};
 use crate::tools::{AppState, FlashData, Params};
-use anyhow::Ok;
 use axum::{
     extract::{Form, Path, Query, State},
     http::StatusCode,
@@ -17,10 +16,10 @@ impl ScoreController {
         state: State<AppState>,
         Query(params): Query<Params>,
         cookies: Cookies,
-    ) -> Result<Html<String>, (StatusCode, &'static str)> {
+    ) -> Result<Html<String>, (StatusCode, &'static str)>{
         let (scores) = ScoreService::find_score(&state.conn)
             .await
-            .expect("Cannot find posts in page");
+            .expect("Cannot find scores in page");
 
         let mut ctx = tera::Context::new();
         ctx.insert("scores", &scores);

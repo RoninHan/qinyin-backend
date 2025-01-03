@@ -1,6 +1,5 @@
 use crate::flash::{get_flash_cookie, post_response, PostResponse};
 use crate::tools::{AppState, FlashData, Params};
-use anyhow::Ok;
 use axum::{
     extract::{Form, Path, Query, State},
     http::StatusCode,
@@ -71,7 +70,7 @@ impl CreationController {
     ) -> Result<PostResponse, (StatusCode, &'static str)> {
         let form = form.0;
 
-        CreationService::update_creation(&state.conn, form)
+        CreationService::update_creation_by_id(&state.conn, form.id,form)
             .await
             .map_err(|_| {
                 (
@@ -91,8 +90,9 @@ impl CreationController {
     pub async fn delete_creation(
         state: State<AppState>,
         mut cookies: Cookies,
-        Path(id): Path<i32>,
+        Path(id): Path<i64>,
     ) -> Result<PostResponse, (StatusCode, &'static str)> {
+
         CreationService::delete_creation(&state.conn, id)
             .await
             .map_err(|_| {
@@ -101,12 +101,10 @@ impl CreationController {
                     "Failed to delete creation",
                 )
             })?;
-        Ok(post_response(
-            &mut cookies,
-            FlashData {
-                kind: "success".to_string(),
-                message: "Creation deleted successfully".to_string(),
-            },
-        ))
+            let data = FlashData {
+                kind: "success".to_owned(),
+                message: "Creation deleted successfully".to_owned(),
+            };
+        Ok(post_response(&mut cookies,data))
     }
 }

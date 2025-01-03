@@ -62,4 +62,17 @@ impl UserServices {
     pub async fn delete_all_users(db: &DbConn) -> Result<DeleteResult, DbErr> {
         User::delete_many().exec(db).await
     }
+
+    pub async fn find_user(
+        db: &DbConn,
+        page: u64,
+        per_page: u64,
+    ) -> Result<(Vec<user::Model>,u64), DbErr> {
+        let paginator = User::find()
+            .order_by_asc(user::Column::Id)
+            .paginate(db, per_page);
+        let num_pages = paginator.num_pages().await?;
+
+        paginator.fetch_page(page - 1).await.map(|p| (p, num_pages))
+    }
 }

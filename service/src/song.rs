@@ -10,10 +10,9 @@ impl SongService {
     ) -> Result<song::ActiveModel, DbErr> {
         song::ActiveModel {
             name: Set(form_data.name.to_owned()),
+            author: Set(form_data.author.to_owned()),
+            song_type_id: Set(form_data.song_type_id.to_owned()),
             singer: Set(form_data.singer.to_owned()),
-            album: Set(form_data.album.to_owned()),
-            cover: Set(form_data.cover.to_owned()),
-            url: Set(form_data.url.to_owned()),
             created_at: Set(chrono::Utc::now().naive_utc()),
             updated_at: Set(chrono::Utc::now().naive_utc()),
             ..Default::default()
@@ -37,9 +36,8 @@ impl SongService {
             id: song.id,
             name: Set(form_data.name.to_owned()),
             singer: Set(form_data.singer.to_owned()),
-            album: Set(form_data.album.to_owned()),
-            cover: Set(form_data.cover.to_owned()),
-            url: Set(form_data.url.to_owned()),
+            author: Set(form_data.author.to_owned()),
+            song_type_id: Set(form_data.song_type_id.to_owned()),
             updated_at: Set(chrono::Utc::now().naive_utc()),
             ..Default::default()
         }
@@ -65,7 +63,7 @@ impl SongService {
         db: &DbConn,
         page: u64,
         per_page: u64,
-    ) -> Result<Vec<song::Model>, DbErr> {
+    ) -> Result<(Vec<song::Model>,u64), DbErr> {
         let paginator = Song::find()
             .order_by_asc(song::Column::Id)
             .paginate(db, per_page);
@@ -74,6 +72,6 @@ impl SongService {
         paginator
             .fetch_page(page - 1)
             .await
-            .map(|page| (page, num_pages))
+            .map(|p| (p, num_pages))
     }
 }

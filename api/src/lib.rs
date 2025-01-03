@@ -19,7 +19,6 @@ use crate::controller::collect::CollectController;
 use crate::controller::creation::CreationController;
 use crate::controller::friends::FriendsController;
 use crate::controller::lyrics::LyricsController;
-use crate::controller::post::PostController;
 use crate::controller::score::ScoreController;
 use crate::controller::song::SongController;
 use crate::controller::song_type::SongTypeController;
@@ -50,43 +49,37 @@ async fn start() -> anyhow::Result<()> {
 
     let app = Router::new()
         .route("/user", get(UserController::list_users))
-        .route("/user/new", post(UserController::new_user))
+        .route("/user/new", post(UserController::create_user))
         .route("/user/update", get(UserController::update_user))
         .route("/user/delete", get(UserController::delete_user))
         .route("/song", get(SongController::list_songs))
-        .route("/song/new", post(SongController::new_song))
+        .route("/song/new", post(SongController::create_song))
         .route("/song/update", get(SongController::update_song))
         .route("/song/delete", get(SongController::delete_song))
         .route("/song_type", get(SongTypeController::list_song_types))
-        .route("/song_type/new", post(SongTypeController::new_song_type))
-        .route(
-            "/song_type/update",
-            get(SongTypeController::update_song_type),
-        )
+        .route("/song_type/new", post(SongTypeController::create_song_type))
         .route(
             "/song_type/delete",
             get(SongTypeController::delete_song_type),
         )
         .route("/score", get(ScoreController::list_scores))
-        .route("/score/new", post(ScoreController::new_score))
+        .route("/score/new", post(ScoreController::create_score))
         .route("/score/update", get(ScoreController::update_score))
         .route("/score/delete", get(ScoreController::delete_score))
         .route("/lyrics", get(LyricsController::list_lyrics))
-        .route("/lyrics/new", post(LyricsController::new_lyrics))
+        .route("/lyrics/new", post(LyricsController::create_lyrics))
         .route("/lyrics/update", get(LyricsController::update_lyrics))
         .route("/lyrics/delete", get(LyricsController::delete_lyrics))
         .route("/friends", get(FriendsController::list_friends))
-        .route("/friends/new", post(FriendsController::new_friends))
+        .route("/friends/new", post(FriendsController::create_friends))
         .route("/friends/update", get(FriendsController::update_friends))
         .route("/friends/delete", get(FriendsController::delete_friends))
         .route("/creation", get(CreationController::list_creations))
-        .route("/creation/new", post(CreationController::new_creation))
+        .route("/creation/new", post(CreationController::create_creation))
         .route("/creation/update", get(CreationController::update_creation))
         .route("/creation/delete", get(CreationController::delete_creation))
         .route("/collect", get(CollectController::list_collects))
-        .route("/collect/new", post(CollectController::new_collect))
-        .route("/collect/update", get(CollectController::update_collect))
-        .route("/collect/delete", get(CollectController::delete_collect))
+        .route("/collect/new", post(CollectController::create_collect))
         .nest_service(
             "/static",
             get_service(ServeDir::new(concat!(

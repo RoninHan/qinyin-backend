@@ -70,7 +70,7 @@ impl SongTypeController {
 
     pub async fn delete_song_type(
         state: State<AppState>,
-        Path(id): Path<i32>,
+        Path(id): Path<i64>,
         mut cookies: Cookies,
     ) -> Result<PostResponse, (StatusCode, &'static str)> {
         SongTypeService::delete_song_type(&state.conn, id)

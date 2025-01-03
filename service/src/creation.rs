@@ -10,7 +10,8 @@ impl CreationService {
     ) -> Result<creation::ActiveModel, DbErr> {
         creation::ActiveModel {
             user_id: Set(form_data.user_id),
-            song_id: Set(form_data.song_id),
+            song_src: Set(form_data.song_src.to_owned()),
+            name: Set(form_data.name.to_owned()),
             created_at: Set(chrono::Utc::now().naive_utc()),
             updated_at: Set(chrono::Utc::now().naive_utc()),
             ..Default::default()
@@ -33,7 +34,8 @@ impl CreationService {
         creation::ActiveModel {
             id: creation.id,
             user_id: Set(form_data.user_id),
-            song_id: Set(form_data.song_id),
+            song_src: Set(form_data.song_src.to_owned()),
+            name:Set(form_data.name.to_owned()),
             updated_at: Set(chrono::Utc::now().naive_utc()),
             ..Default::default()
         }

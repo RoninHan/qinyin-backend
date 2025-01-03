@@ -53,15 +53,12 @@ impl SongTypeService {
         db: &DbConn,
         page: u64,
         per_page: u64,
-    ) -> Result<Vec<song_type::Model>, DbErr> {
+    ) -> Result<(Vec<song_type::Model>,u64), DbErr> {
         let paginator = SongType::find()
             .order_by_asc(song_type::Column::Id)
             .paginate(db, per_page);
         let num_pages = paginator.num_pages().await?;
 
-        paginator
-            .fetch_page(page - 1)
-            .await
-            .map(|page| (page, num_pages))
+        paginator.fetch_page(page - 1).await.map(|p| (p, num_pages))
     }
 }
