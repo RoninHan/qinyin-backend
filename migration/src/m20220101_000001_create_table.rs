@@ -12,13 +12,13 @@ impl MigrationTrait for Migration {
                 Table::create()
                     .table(User::Table)
                     .if_not_exists()
-                    .col(pk_auto(Post::Id))
+                    .col(pk_auto(User::Id))
                     .col(ColumnDef::new(User::Name).string().not_null())
                     .col(ColumnDef::new(User::AppId).string().not_null())
                     .col(ColumnDef::new(User::Sex).integer().not_null())
-                    .col(ColumnDef::new(User::Birthday).date().not_null())
-                    .col(ColumnDef::new(User::Phone).string().not_null())
-                    .col(ColumnDef::new(User::Email).string().not_null())
+                    .col(ColumnDef::new(User::Birthday).date())
+                    .col(ColumnDef::new(User::Phone).string())
+                    .col(ColumnDef::new(User::Email).string())
                     .col(ColumnDef::new(User::CreatedAt).timestamp().not_null())
                     .col(ColumnDef::new(User::UpdatedAt).timestamp().not_null())
                     .to_owned(),
@@ -125,6 +125,8 @@ impl MigrationTrait for Migration {
                     .to_owned(),
             )
             .await?;
+
+        Ok(())
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
@@ -237,7 +239,7 @@ enum Creation {
     Id,
     UserId,
     SongSrc,
-    Name
+    Name,
     CreatedAt,
     UpdatedAt,
 }
