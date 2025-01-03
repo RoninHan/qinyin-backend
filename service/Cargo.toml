@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-sea-orm = { version = "1.1.3", features = ["debug-print", "runtime-tokio-native-tls", "sqlx-mysql"] }
+sea-orm = { version = "1.1.3", features = ["debug-print", "runtime-tokio-native-tls", "sqlx-postgres"] }
 entity = { path = "../entity" }
 chrono = "0.4.39"
 

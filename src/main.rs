@@ -1,3 +1,3 @@
 fn main() {
-    rbac_api::main();
+    api::main();
 }
