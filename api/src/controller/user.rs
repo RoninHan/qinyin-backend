@@ -1,13 +1,15 @@
 use crate::tools::{AppState, FlashData, Params};
 use service::UserServices;
 use axum::{
-    response::Html,
+    response::Json,
     extract::{Form, Path, Query, State},
     http::StatusCode
 };
 use tower_cookies:: Cookies;
 use crate::flash::{get_flash_cookie, post_response, PostResponse};
 use entity::user;
+
+use serde_json::json;
 
 pub struct UserController;
 
@@ -16,7 +18,7 @@ impl UserController {
         state: State<AppState>,
         Query(params): Query<Params>,
         cookies: Cookies,
-    ) -> Result<Html<String>, (StatusCode, &'static str)> {
+    ) -> Result<Json<serde_json::Value>, (StatusCode, &'static str)> {
         let page = params.page.unwrap_or(1);
         let posts_per_page = params.posts_per_page.unwrap_or(5);
 
@@ -34,12 +36,7 @@ impl UserController {
             ctx.insert("flash", &value);
         }
 
-        let body = state
-            .templates
-            .render("index.html.tera", &ctx)
-            .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Template error"))?;
-
-        Ok(Html(body))
+        Ok(Json(json!(posts)))
     }
 
     pub async fn create_user(
