@@ -1,12 +1,12 @@
-use crate::flash::{get_flash_cookie, post_response, PostResponse};
-use crate::tools::{AppState, FlashData, Params};
+use crate::tools::{AppState, Params, ResponseData, ResponseStatus};
 use axum::{
     extract::{Form, Path, Query, State},
     http::StatusCode,
-    response::Html,
+    response::Json,
 };
-use entity::song_type;
-use service::SongTypeService;
+use serde_json::json;
+use serde_json::to_value;
+use service::{SongTypeModel, SongTypeService};
 use tower_cookies::Cookies;
 
 pub struct SongTypeController;
@@ -15,8 +15,7 @@ impl SongTypeController {
     pub async fn list_song_types(
         state: State<AppState>,
         Query(params): Query<Params>,
-        cookies: Cookies,
-    ) -> Result<Html<String>, (StatusCode, &'static str)> {
+    ) -> Result<Json<serde_json::Value>, (StatusCode, &'static str)> {
         let page = params.page.unwrap_or(1);
         let posts_per_page = params.posts_per_page.unwrap_or(5);
 
@@ -25,31 +24,19 @@ impl SongTypeController {
                 .await
                 .expect("Cannot find posts in page");
 
-        let mut ctx = tera::Context::new();
-        ctx.insert("song_types", &song_types);
-        ctx.insert("page", &page);
-        ctx.insert("posts_per_page", &posts_per_page);
-        ctx.insert("num_pages", &num_pages);
-
-        if let Some(value) = get_flash_cookie::<FlashData>(&cookies) {
-            ctx.insert("flash", &value);
-        }
-
-        let body = state
-            .templates
-            .render("index.html.tera", &ctx)
-            .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Template error"))?;
-
-        Ok(Html(body))
+        let data = ResponseData {
+            status: ResponseStatus::Success,
+            data: song_types,
+        };
+        let json_data = to_value(data).unwrap();
+        println!("Json data: {:?}", json_data);
+        Ok(Json(json!(json_data)))
     }
 
     pub async fn create_song_type(
         state: State<AppState>,
-        mut cookies: Cookies,
-        form: Form<song_type::Model>,
-    ) -> Result<PostResponse, (StatusCode, &'static str)> {
-        let form = form.0;
-
+        Json(form): Json<SongTypeModel>,
+    ) -> Result<Json<serde_json::Value>, (StatusCode, &'static str)> {
         SongTypeService::create_song_type(&state.conn, form)
             .await
             .map_err(|_| {
@@ -59,20 +46,16 @@ impl SongTypeController {
                 )
             })?;
 
-        Ok(post_response(
-            &mut cookies,
-            FlashData {
-                kind: "success".to_string(),
-                message: "Song type created successfully".to_string(),
-            },
-        ))
+        Ok(Json(json!({
+            "status": "success",
+            "message": "Song type created successfully"
+        })))
     }
 
     pub async fn delete_song_type(
         state: State<AppState>,
-        Path(id): Path<i64>,
-        mut cookies: Cookies,
-    ) -> Result<PostResponse, (StatusCode, &'static str)> {
+        Path(id): Path<i32>,
+    ) -> Result<Json<serde_json::Value>, (StatusCode, &'static str)> {
         SongTypeService::delete_song_type(&state.conn, id)
             .await
             .map_err(|_| {
@@ -82,12 +65,9 @@ impl SongTypeController {
                 )
             })?;
 
-        Ok(post_response(
-            &mut cookies,
-            FlashData {
-                kind: "success".to_string(),
-                message: "Song type deleted successfully".to_string(),
-            },
-        ))
+        Ok(Json(json!({
+            "status": "success",
+            "message": "Song type deleted successfully"
+        })))
     }
 }

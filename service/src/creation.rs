@@ -1,19 +1,30 @@
 use ::entity::{creation, creation::Entity as Creation};
+use chrono::Utc;
+use prelude::DateTimeWithTimeZone;
 use sea_orm::*;
+
+use serde::{Deserialize, Serialize};
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct CreationModel {
+    pub user_id: i32,
+    pub song_src: String,
+    pub name: String,
+}
 
 pub struct CreationService;
 
 impl CreationService {
     pub async fn create_creation(
         db: &DbConn,
-        form_data: creation::Model,
+        form_data: CreationModel,
     ) -> Result<creation::ActiveModel, DbErr> {
         creation::ActiveModel {
             user_id: Set(form_data.user_id),
             song_src: Set(form_data.song_src.to_owned()),
             name: Set(form_data.name.to_owned()),
-            created_at: Set(chrono::Utc::now().naive_utc()),
-            updated_at: Set(chrono::Utc::now().naive_utc()),
+            created_at: Set(DateTimeWithTimeZone::from(Utc::now())),
+            updated_at: Set(DateTimeWithTimeZone::from(Utc::now())),
             ..Default::default()
         }
         .save(db)
@@ -22,8 +33,8 @@ impl CreationService {
 
     pub async fn update_creation_by_id(
         db: &DbConn,
-        id: i64,
-        form_data: creation::Model,
+        id: i32,
+        form_data: CreationModel,
     ) -> Result<creation::Model, DbErr> {
         let creation: creation::ActiveModel = Creation::find_by_id(id)
             .one(db)
@@ -35,15 +46,15 @@ impl CreationService {
             id: creation.id,
             user_id: Set(form_data.user_id),
             song_src: Set(form_data.song_src.to_owned()),
-            name:Set(form_data.name.to_owned()),
-            updated_at: Set(chrono::Utc::now().naive_utc()),
+            name: Set(form_data.name.to_owned()),
+            updated_at: Set(DateTimeWithTimeZone::from(Utc::now())),
             ..Default::default()
         }
         .update(db)
         .await
     }
 
-    pub async fn delete_creation(db: &DbConn, id: i64) -> Result<DeleteResult, DbErr> {
+    pub async fn delete_creation(db: &DbConn, id: i32) -> Result<DeleteResult, DbErr> {
         let creation: creation::ActiveModel = Creation::find_by_id(id)
             .one(db)
             .await?
@@ -55,7 +66,7 @@ impl CreationService {
 
     pub async fn find_creation_by_id(
         db: &DbConn,
-        id: i64,
+        id: i32,
     ) -> Result<Option<creation::Model>, DbErr> {
         Creation::find_by_id(id).one(db).await
     }

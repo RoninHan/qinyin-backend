@@ -4,7 +4,7 @@ mod tools;
 
 use axum::{
     http::StatusCode,
-    routing::{get, get_service, post},
+    routing::{delete, get, get_service, post},
     Router,
 };
 use migration::{Migrator, MigratorTrait};
@@ -50,34 +50,49 @@ async fn start() -> anyhow::Result<()> {
     let app = Router::new()
         .route("/user", get(UserController::list_users))
         .route("/user/new", post(UserController::create_user))
-        .route("/user/update", get(UserController::update_user))
-        .route("/user/delete", get(UserController::delete_user))
+        .route("/user/update/:id", post(UserController::update_user))
+        .route("/user/delete/:id", delete(UserController::delete_user))
         .route("/song", get(SongController::list_songs))
         .route("/song/new", post(SongController::create_song))
-        .route("/song/update", get(SongController::update_song))
-        .route("/song/delete", get(SongController::delete_song))
+        .route("/song/update/:id", post(SongController::update_song))
+        .route("/song/delete/:id", delete(SongController::delete_song))
         .route("/song_type", get(SongTypeController::list_song_types))
         .route("/song_type/new", post(SongTypeController::create_song_type))
         .route(
-            "/song_type/delete",
-            get(SongTypeController::delete_song_type),
+            "/song_type/delete/:id",
+            delete(SongTypeController::delete_song_type),
         )
         .route("/score", get(ScoreController::list_scores))
         .route("/score/new", post(ScoreController::create_score))
-        .route("/score/update", get(ScoreController::update_score))
-        .route("/score/delete", get(ScoreController::delete_score))
+        .route("/score/update/:id", post(ScoreController::update_score))
+        .route("/score/delete/:id", delete(ScoreController::delete_score))
         .route("/lyrics", get(LyricsController::list_lyrics))
         .route("/lyrics/new", post(LyricsController::create_lyrics))
-        .route("/lyrics/update", get(LyricsController::update_lyrics))
-        .route("/lyrics/delete", get(LyricsController::delete_lyrics))
+        .route("/lyrics/update/:id", post(LyricsController::update_lyrics))
+        .route(
+            "/lyrics/delete/:id",
+            delete(LyricsController::delete_lyrics),
+        )
         .route("/friends", get(FriendsController::list_friends))
         .route("/friends/new", post(FriendsController::create_friends))
-        .route("/friends/update", get(FriendsController::update_friends))
-        .route("/friends/delete", get(FriendsController::delete_friends))
+        .route(
+            "/friends/update/:id",
+            get(FriendsController::update_friends),
+        )
+        .route(
+            "/friends/delete/:id",
+            get(FriendsController::delete_friends),
+        )
         .route("/creation", get(CreationController::list_creations))
         .route("/creation/new", post(CreationController::create_creation))
-        .route("/creation/update", get(CreationController::update_creation))
-        .route("/creation/delete", get(CreationController::delete_creation))
+        .route(
+            "/creation/update",
+            post(CreationController::update_creation),
+        )
+        .route(
+            "/creation/delete/:id",
+            delete(CreationController::delete_creation),
+        )
         .route("/collect", get(CollectController::list_collects))
         .route("/collect/new", post(CollectController::create_collect))
         .nest_service(

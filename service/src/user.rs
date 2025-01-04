@@ -1,5 +1,6 @@
 use ::entity::{user, user::Entity as User};
 use chrono::{DateTime, Utc};
+use prelude::DateTimeWithTimeZone;
 use sea_orm::*;
 use serde::{Deserialize, Serialize};
 
@@ -10,7 +11,7 @@ pub struct UserModel {
     pub email: String,
     pub app_id: String,
     pub phone: String,
-    pub birthday: DateTime<Utc>,
+    pub birthday: Option<DateTimeWithTimeZone>,
 }
 
 pub struct UserServices;
@@ -24,12 +25,12 @@ impl UserServices {
         user::ActiveModel {
             name: Set(form_data.name.to_owned()),
             sex: Set(sex),
-            email: Set(form_data.email.to_owned()),
+            email: Set(Some(form_data.email)),
             app_id: Set(form_data.app_id.to_owned()),
-            phone: Set(form_data.phone.to_owned()),
-            birthday: Set(form_data.birthday.naive_utc()),
-            created_at: Set(chrono::Utc::now().naive_utc()),
-            updated_at: Set(chrono::Utc::now().naive_utc()),
+            phone: Set(Some(form_data.phone.to_owned())),
+            birthday: Set(form_data.birthday),
+            created_at: Set(DateTimeWithTimeZone::from(Utc::now())),
+            updated_at: Set(DateTimeWithTimeZone::from(Utc::now())),
             ..Default::default()
         }
         .save(db)
@@ -39,23 +40,23 @@ impl UserServices {
     pub async fn update_user_by_id(
         db: &DbConn,
         id: i32,
-        form_data: user::Model,
+        form_data: UserModel,
     ) -> Result<user::Model, DbErr> {
         let user: user::ActiveModel = User::find_by_id(id)
             .one(db)
             .await?
             .ok_or(DbErr::Custom("Cannot find user.".to_owned()))
             .map(Into::into)?;
-
+        let sex: i32 = form_data.sex.parse().expect("msg");
         user::ActiveModel {
             id: user.id,
             name: Set(form_data.name.to_owned()),
-            email: Set(form_data.email.to_owned()),
+            email: Set(Some(form_data.email)),
             app_id: Set(form_data.app_id.to_owned()),
-            sex: Set(form_data.sex.to_owned()),
-            phone: Set(form_data.phone.to_owned()),
+            sex: Set(sex),
+            phone: Set(Some(form_data.phone)),
             birthday: Set(form_data.birthday),
-            updated_at: Set(chrono::Utc::now().naive_utc()),
+            updated_at: Set(DateTimeWithTimeZone::from(Utc::now())),
             ..Default::default()
         }
         .update(db)

@@ -43,8 +43,16 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Song::Author).string().not_null())
                     .col(ColumnDef::new(Song::SongTypeId).integer())
                     .col(ColumnDef::new(Song::Singer).string().not_null())
-                    .col(ColumnDef::new(Song::CreatedAt).timestamp().not_null())
-                    .col(ColumnDef::new(Song::UpdatedAt).timestamp().not_null())
+                    .col(
+                        ColumnDef::new(User::CreatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(User::UpdatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null(),
+                    )
                     .to_owned(),
             )
             .await?;
@@ -56,8 +64,16 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(pk_auto(SongType::Id))
                     .col(ColumnDef::new(SongType::Name).string().not_null())
-                    .col(ColumnDef::new(SongType::CreatedAt).timestamp().not_null())
-                    .col(ColumnDef::new(SongType::UpdatedAt).timestamp().not_null())
+                    .col(
+                        ColumnDef::new(User::CreatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(User::UpdatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null(),
+                    )
                     .to_owned(),
             )
             .await?;
@@ -71,8 +87,16 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Score::UserId).integer().not_null())
                     .col(ColumnDef::new(Score::SongId).integer().not_null())
                     .col(ColumnDef::new(Score::Score).integer().not_null())
-                    .col(ColumnDef::new(Score::CreatedAt).timestamp().not_null())
-                    .col(ColumnDef::new(Score::UpdatedAt).timestamp().not_null())
+                    .col(
+                        ColumnDef::new(User::CreatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(User::UpdatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null(),
+                    )
                     .to_owned(),
             )
             .await?;
@@ -85,8 +109,16 @@ impl MigrationTrait for Migration {
                     .col(pk_auto(Lyric::Id))
                     .col(ColumnDef::new(Lyric::SongId).integer().not_null())
                     .col(ColumnDef::new(Lyric::Lyric).string().not_null())
-                    .col(ColumnDef::new(Lyric::CreatedAt).timestamp().not_null())
-                    .col(ColumnDef::new(Lyric::UpdatedAt).timestamp().not_null())
+                    .col(
+                        ColumnDef::new(User::CreatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(User::UpdatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null(),
+                    )
                     .to_owned(),
             )
             .await?;
@@ -99,8 +131,16 @@ impl MigrationTrait for Migration {
                     .col(pk_auto(Friends::Id))
                     .col(ColumnDef::new(Friends::UserId).integer().not_null())
                     .col(ColumnDef::new(Friends::FriendUserId).integer().not_null())
-                    .col(ColumnDef::new(Friends::CreatedAt).timestamp().not_null())
-                    .col(ColumnDef::new(Friends::UpdatedAt).timestamp().not_null())
+                    .col(
+                        ColumnDef::new(User::CreatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(User::UpdatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null(),
+                    )
                     .to_owned(),
             )
             .await?;
@@ -114,8 +154,16 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Creation::UserId).integer().not_null())
                     .col(ColumnDef::new(Creation::SongSrc).string().not_null())
                     .col(ColumnDef::new(Creation::Name).string().not_null())
-                    .col(ColumnDef::new(Creation::CreatedAt).timestamp().not_null())
-                    .col(ColumnDef::new(Creation::UpdatedAt).timestamp().not_null())
+                    .col(
+                        ColumnDef::new(User::CreatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(User::UpdatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null(),
+                    )
                     .to_owned(),
             )
             .await?;
@@ -128,8 +176,16 @@ impl MigrationTrait for Migration {
                     .col(pk_auto(Collect::Id))
                     .col(ColumnDef::new(Collect::UserId).integer().not_null())
                     .col(ColumnDef::new(Collect::SongId).integer().not_null())
-                    .col(ColumnDef::new(Collect::CreatedAt).timestamp().not_null())
-                    .col(ColumnDef::new(Collect::UpdatedAt).timestamp().not_null())
+                    .col(
+                        ColumnDef::new(User::CreatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(User::UpdatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null(),
+                    )
                     .to_owned(),
             )
             .await?;
