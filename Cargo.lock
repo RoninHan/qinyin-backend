@@ -2759,6 +2759,7 @@ dependencies = [
  "chrono",
  "entity",
  "sea-orm",
+ "serde",
  "tokio",
 ]
 

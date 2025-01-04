@@ -1,8 +1,6 @@
 use serde::{Deserialize, Serialize};
+use service::sea_orm::DatabaseConnection;
 use tera::Tera;
-use service::{
-    sea_orm::{ DatabaseConnection}
-};
 #[derive(Clone)]
 pub struct AppState {
     pub templates: Tera,
@@ -19,4 +17,16 @@ pub struct Params {
 pub struct FlashData {
     pub kind: String,
     pub message: String,
+}
+
+#[derive(Deserialize, Serialize)]
+pub enum ResponseStatus {
+    Success,
+    Error,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct ResponseData<T> {
+    pub status: ResponseStatus,
+    pub data: T,
 }

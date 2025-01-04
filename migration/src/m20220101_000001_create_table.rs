@@ -16,11 +16,19 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(User::Name).string().not_null())
                     .col(ColumnDef::new(User::AppId).string().not_null())
                     .col(ColumnDef::new(User::Sex).integer().not_null())
-                    .col(ColumnDef::new(User::Birthday).date())
+                    .col(ColumnDef::new(User::Birthday).timestamp_with_time_zone())
                     .col(ColumnDef::new(User::Phone).string())
                     .col(ColumnDef::new(User::Email).string())
-                    .col(ColumnDef::new(User::CreatedAt).timestamp().not_null())
-                    .col(ColumnDef::new(User::UpdatedAt).timestamp().not_null())
+                    .col(
+                        ColumnDef::new(User::CreatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(User::UpdatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null(),
+                    )
                     .to_owned(),
             )
             .await?;
