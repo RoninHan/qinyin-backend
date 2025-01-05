@@ -4,7 +4,7 @@ use axum::{
     http::StatusCode,
     response::Json,
 };
-use service::{ScoreModel, ScoreService};
+use service::{FriendRankingModel, ScoreModel, ScoreService};
 
 use serde_json::json;
 use serde_json::to_value;
@@ -66,5 +66,41 @@ impl ScoreController {
             "status": "success",
             "message": "Score deleted successfully"
         })))
+    }
+
+    // 全球排行榜
+    pub async fn get_globale_ranking(
+        state: State<AppState>,
+        Path(id): Path<i32>,
+    ) -> Result<Json<serde_json::Value>, (StatusCode, &'static str)> {
+        let scores = ScoreService::get_score_by_song_id(&state.conn, id)
+            .await
+            .expect("Cannot find scores in page");
+
+        let data = ResponseData {
+            status: ResponseStatus::Success,
+            data: scores,
+        };
+        let json_data = to_value(data).unwrap();
+        println!("Json data: {:?}", json_data);
+        Ok(Json(json!(json_data)))
+    }
+
+    //好友排行版
+    pub async fn get_friends_ranking(
+        state: State<AppState>,
+        Json(form): Json<FriendRankingModel>,
+    ) -> Result<Json<serde_json::Value>, (StatusCode, &'static str)> {
+        let scores = ScoreService::get_score_by_user_id(&state.conn, form.song_id, form.user_id)
+            .await
+            .expect("Cannot find scores in page");
+
+        let data = ResponseData {
+            status: ResponseStatus::Success,
+            data: scores,
+        };
+        let json_data = to_value(data).unwrap();
+        println!("Json data: {:?}", json_data);
+        Ok(Json(json!(json_data)))
     }
 }

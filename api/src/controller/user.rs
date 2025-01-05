@@ -79,4 +79,18 @@ impl UserController {
             "message": "User deleted"
         })))
     }
+
+    pub async fn get_user_by_id(
+        state: State<AppState>,
+        Path(id): Path<i32>,
+    ) -> Result<Json<serde_json::Value>, (StatusCode, &'static str)> {
+        let user = UserServices::find_user_by_id(&state.conn, id)
+            .await
+            .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Failed to find user"))?;
+
+        Ok(Json(json!({
+            "status": "success",
+            "data": user
+        })))
+    }
 }

@@ -12,6 +12,12 @@ pub struct ScoreModel {
     pub score: i32,
 }
 
+#[derive(Deserialize, Serialize, Debug)]
+pub struct FriendRankingModel {
+    pub user_id: i32,
+    pub song_id: i32,
+}
+
 pub struct ScoreService;
 
 impl ScoreService {
@@ -70,5 +76,26 @@ impl ScoreService {
 
     pub async fn find_score(db: &DbConn) -> Result<Vec<score::Model>, DbErr> {
         Score::find().all(db).await
+    }
+
+    pub async fn get_score_by_song_id(db: &DbConn, id: i32) -> Result<Vec<score::Model>, DbErr> {
+        Score::find()
+            .filter(score::Column::SongId.eq(id))
+            .order_by_desc(score::Column::Score)
+            .all(db)
+            .await
+    }
+
+    pub async fn get_score_by_user_id(
+        db: &DbConn,
+        song_id: i32,
+        user_id: i32,
+    ) -> Result<Vec<score::Model>, DbErr> {
+        Score::find()
+            .filter(score::Column::SongId.eq(song_id))
+            .filter(score::Column::UserId.eq(user_id))
+            .order_by_desc(score::Column::Score)
+            .all(db)
+            .await
     }
 }

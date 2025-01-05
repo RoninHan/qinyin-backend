@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct SongModel {
-    pub id: i32,
     pub name: String,
     pub author: String,
     pub song_type_id: i32,

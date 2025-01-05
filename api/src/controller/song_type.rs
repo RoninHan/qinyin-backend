@@ -70,4 +70,24 @@ impl SongTypeController {
             "message": "Song type deleted successfully"
         })))
     }
+
+    pub async fn update_song_type(
+        state: State<AppState>,
+        Path(id): Path<i32>,
+        Json(form): Json<SongTypeModel>,
+    ) -> Result<Json<serde_json::Value>, (StatusCode, &'static str)> {
+        SongTypeService::update_song_type_by_id(&state.conn, id, form)
+            .await
+            .map_err(|_| {
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Failed to update song type",
+                )
+            })?;
+
+        Ok(Json(json!({
+            "status": "success",
+            "message": "Song type updated successfully"
+        })))
+    }
 }

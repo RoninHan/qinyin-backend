@@ -82,4 +82,21 @@ impl CreationController {
             "message": "Creation deleted successfully"
         })))
     }
+
+    pub async fn get_creation_by_user_id(
+        state: State<AppState>,
+        Path(id): Path<i32>,
+    ) -> Result<Json<serde_json::Value>, (StatusCode, &'static str)> {
+        let creation = CreationService::find_creation_by_user_id(&state.conn, id)
+            .await
+            .expect("Cannot find creation by user id");
+
+        let data = ResponseData {
+            status: ResponseStatus::Success,
+            data: creation,
+        };
+        let json_data = to_value(data).unwrap();
+        println!("Json data: {:?}", json_data);
+        Ok(Json(json!(json_data)))
+    }
 }

@@ -64,11 +64,14 @@ impl CreationService {
         creation.delete(db).await
     }
 
-    pub async fn find_creation_by_id(
+    pub async fn find_creation_by_user_id(
         db: &DbConn,
-        id: i32,
+        user_id: i32,
     ) -> Result<Option<creation::Model>, DbErr> {
-        Creation::find_by_id(id).one(db).await
+        Creation::find()
+            .filter(creation::Column::UserId.eq(user_id))
+            .one(db)
+            .await
     }
 
     pub async fn find_creation(db: &DbConn) -> Result<Vec<creation::Model>, DbErr> {
