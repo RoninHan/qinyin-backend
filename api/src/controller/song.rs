@@ -4,6 +4,7 @@ use axum::{
     http::StatusCode,
     response::Json,
 };
+use entity::song;
 use service::{SongModel, SongService};
 
 use serde_json::json;
@@ -36,14 +37,25 @@ impl SongController {
         state: State<AppState>,
         Json(form): Json<SongModel>,
     ) -> Result<Json<serde_json::Value>, (StatusCode, &'static str)> {
-        SongService::create_song(&state.conn, form)
+        let res = SongService::create_song(&state.conn, form)
             .await
             .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Failed to create song"))?;
 
-        Ok(Json(json!({
-            "status": "success",
-            "message": "Song created successfully"
-        })))
+        let data = ResponseData {
+            status: ResponseStatus::Success,
+            data: song::Model {
+                id: res.id.unwrap(),
+                name: res.name.unwrap(),
+                author: res.author.unwrap(),
+                song_type_id: res.song_type_id.unwrap(),
+                singer: res.singer.unwrap(),
+                created_at: res.created_at.unwrap(),
+                updated_at: res.updated_at.unwrap(),
+            },
+        };
+
+        let json_data = to_value(data).unwrap();
+        Ok(Json(json!(json_data)))
     }
 
     pub async fn update_song(
