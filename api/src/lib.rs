@@ -7,6 +7,7 @@ use axum::{
     routing::{delete, get, get_service, post},
     Router,
 };
+use controller::setting::SettingController;
 use migration::{Migrator, MigratorTrait};
 use service::sea_orm::Database;
 
@@ -112,6 +113,9 @@ async fn start() -> anyhow::Result<()> {
         )
         .route("/collect", get(CollectController::list_collects))
         .route("/collect/new", post(CollectController::create_collect))
+        .route("/setting", get(SettingController::list_settings))
+        .route("/setting/update", post(SettingController::update_setting))
+        .route("/setting/new", post(SettingController::update_setting))
         .nest_service(
             "/static",
             get_service(ServeDir::new(concat!(
