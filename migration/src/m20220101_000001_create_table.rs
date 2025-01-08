@@ -189,7 +189,26 @@ impl MigrationTrait for Migration {
                     .to_owned(),
             )
             .await?;
-
+        manager
+            .create_table(
+                Table::create()
+                    .table(Setting::Table)
+                    .if_not_exists()
+                    .col(pk_auto(Setting::Id))
+                    .col(ColumnDef::new(Setting::DeviceId).string().not_null())
+                    .col(
+                        ColumnDef::new(User::CreatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(User::UpdatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null(),
+                    )
+                    .to_owned(),
+            )
+            .await?;
         Ok(())
     }
 
@@ -227,6 +246,9 @@ impl MigrationTrait for Migration {
             .drop_table(Table::drop().table(Collect::Table).to_owned())
             .await?;
 
+        manager
+            .drop_table(Table::drop().table(Setting::Table).to_owned())
+            .await?;
         Ok(())
     }
 }
@@ -314,6 +336,15 @@ enum Collect {
     Id,
     UserId,
     SongId,
+    CreatedAt,
+    UpdatedAt,
+}
+
+#[derive(DeriveIden)]
+enum Setting {
+    Table,
+    Id,
+    DeviceId,
     CreatedAt,
     UpdatedAt,
 }
