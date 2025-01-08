@@ -11,7 +11,7 @@ use controller::setting::SettingController;
 use migration::{Migrator, MigratorTrait};
 use service::sea_orm::Database;
 
-use std::env;
+use std::{env, sync::LazyLock};
 use tera::Tera;
 use tower_cookies::CookieManagerLayer;
 use tower_http::services::ServeDir;
