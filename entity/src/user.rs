@@ -11,6 +11,8 @@ pub struct Model {
     pub name: String,
     pub app_id: String,
     pub sex: i32,
+    pub password: Option<String>,
+    pub is_administrator: bool,
     pub birthday: Option<DateTimeWithTimeZone>,
     pub phone: Option<String>,
     pub email: Option<String>,

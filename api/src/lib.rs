@@ -1,17 +1,20 @@
 mod controller;
 mod flash;
+mod middleware;
 mod tools;
 
 use axum::{
     http::StatusCode,
+    middleware as axum_middleware,
     routing::{delete, get, get_service, post},
     Router,
 };
 use controller::setting::SettingController;
+use middleware::auth::Auth;
 use migration::{Migrator, MigratorTrait};
 use service::sea_orm::Database;
 
-use std::{env, sync::LazyLock};
+use std::env;
 use tera::Tera;
 use tower_cookies::CookieManagerLayer;
 use tower_http::services::ServeDir;
@@ -49,7 +52,13 @@ async fn start() -> anyhow::Result<()> {
     let state = AppState { templates, conn };
 
     let app = Router::new()
-        .route("/user", get(UserController::list_users))
+        .route(
+            "/user",
+            get(UserController::list_users).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
+        )
         .route("/user/:id", get(UserController::get_user_by_id))
         .route("/user/new", post(UserController::create_user))
         .route("/user/update/:id", post(UserController::update_user))

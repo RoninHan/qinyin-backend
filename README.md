@@ -11,3 +11,11 @@
 
 ### 生成实体
  ``sea-orm-cli generate entity  -o entity/src ``
+
+ ### build
+ `` CROSS_COMPILE=x86_64-linux-musl- cargo build --release --target x86_64-unknown-linux-musl ``
+ or
+
+ `` cargo build --release --target x86_64-unknown-linux-musl ``
+
+ 參考：[编译为 linux x86 目标](https://blog.csdn.net/jiaoyangwm/article/details/136367639)

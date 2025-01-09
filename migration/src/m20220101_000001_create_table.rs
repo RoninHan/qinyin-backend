@@ -16,6 +16,8 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(User::Name).string().not_null())
                     .col(ColumnDef::new(User::AppId).string().not_null())
                     .col(ColumnDef::new(User::Sex).integer().not_null())
+                    .col(ColumnDef::new(User::Password).string())
+                    .col(ColumnDef::new(User::IsAdministrator).boolean().not_null())
                     .col(ColumnDef::new(User::Birthday).timestamp_with_time_zone())
                     .col(ColumnDef::new(User::Phone).string())
                     .col(ColumnDef::new(User::Email).string())
@@ -44,12 +46,12 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Song::SongTypeId).integer())
                     .col(ColumnDef::new(Song::Singer).string().not_null())
                     .col(
-                        ColumnDef::new(User::CreatedAt)
+                        ColumnDef::new(Song::CreatedAt)
                             .timestamp_with_time_zone()
                             .not_null(),
                     )
                     .col(
-                        ColumnDef::new(User::UpdatedAt)
+                        ColumnDef::new(Song::UpdatedAt)
                             .timestamp_with_time_zone()
                             .not_null(),
                     )
@@ -65,12 +67,12 @@ impl MigrationTrait for Migration {
                     .col(pk_auto(SongType::Id))
                     .col(ColumnDef::new(SongType::Name).string().not_null())
                     .col(
-                        ColumnDef::new(User::CreatedAt)
+                        ColumnDef::new(SongType::CreatedAt)
                             .timestamp_with_time_zone()
                             .not_null(),
                     )
                     .col(
-                        ColumnDef::new(User::UpdatedAt)
+                        ColumnDef::new(SongType::UpdatedAt)
                             .timestamp_with_time_zone()
                             .not_null(),
                     )
@@ -88,12 +90,12 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Score::SongId).integer().not_null())
                     .col(ColumnDef::new(Score::Score).integer().not_null())
                     .col(
-                        ColumnDef::new(User::CreatedAt)
+                        ColumnDef::new(Score::CreatedAt)
                             .timestamp_with_time_zone()
                             .not_null(),
                     )
                     .col(
-                        ColumnDef::new(User::UpdatedAt)
+                        ColumnDef::new(Score::UpdatedAt)
                             .timestamp_with_time_zone()
                             .not_null(),
                     )
@@ -110,12 +112,12 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Lyric::SongId).integer().not_null())
                     .col(ColumnDef::new(Lyric::Lyric).string().not_null())
                     .col(
-                        ColumnDef::new(User::CreatedAt)
+                        ColumnDef::new(Lyric::CreatedAt)
                             .timestamp_with_time_zone()
                             .not_null(),
                     )
                     .col(
-                        ColumnDef::new(User::UpdatedAt)
+                        ColumnDef::new(Lyric::UpdatedAt)
                             .timestamp_with_time_zone()
                             .not_null(),
                     )
@@ -132,12 +134,12 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Friends::UserId).integer().not_null())
                     .col(ColumnDef::new(Friends::FriendUserId).integer().not_null())
                     .col(
-                        ColumnDef::new(User::CreatedAt)
+                        ColumnDef::new(Friends::CreatedAt)
                             .timestamp_with_time_zone()
                             .not_null(),
                     )
                     .col(
-                        ColumnDef::new(User::UpdatedAt)
+                        ColumnDef::new(Friends::UpdatedAt)
                             .timestamp_with_time_zone()
                             .not_null(),
                     )
@@ -155,12 +157,12 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Creation::SongSrc).string().not_null())
                     .col(ColumnDef::new(Creation::Name).string().not_null())
                     .col(
-                        ColumnDef::new(User::CreatedAt)
+                        ColumnDef::new(Creation::CreatedAt)
                             .timestamp_with_time_zone()
                             .not_null(),
                     )
                     .col(
-                        ColumnDef::new(User::UpdatedAt)
+                        ColumnDef::new(Creation::UpdatedAt)
                             .timestamp_with_time_zone()
                             .not_null(),
                     )
@@ -177,12 +179,12 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Collect::UserId).integer().not_null())
                     .col(ColumnDef::new(Collect::SongId).integer().not_null())
                     .col(
-                        ColumnDef::new(User::CreatedAt)
+                        ColumnDef::new(Collect::CreatedAt)
                             .timestamp_with_time_zone()
                             .not_null(),
                     )
                     .col(
-                        ColumnDef::new(User::UpdatedAt)
+                        ColumnDef::new(Collect::UpdatedAt)
                             .timestamp_with_time_zone()
                             .not_null(),
                     )
@@ -197,12 +199,12 @@ impl MigrationTrait for Migration {
                     .col(pk_auto(Setting::Id))
                     .col(ColumnDef::new(Setting::DeviceId).string().not_null())
                     .col(
-                        ColumnDef::new(User::CreatedAt)
+                        ColumnDef::new(Setting::CreatedAt)
                             .timestamp_with_time_zone()
                             .not_null(),
                     )
                     .col(
-                        ColumnDef::new(User::UpdatedAt)
+                        ColumnDef::new(Setting::UpdatedAt)
                             .timestamp_with_time_zone()
                             .not_null(),
                     )
@@ -260,6 +262,8 @@ enum User {
     Name,
     AppId,
     Sex,
+    Password,
+    IsAdministrator,
     Birthday,
     Phone,
     Email,

@@ -17,7 +17,7 @@ impl SettingService {
         device_id: Option<String>,
     ) -> Result<setting::ActiveModel, DbErr> {
         setting::ActiveModel {
-            device_id: Set(device_id),
+            device_id: Set(device_id.unwrap_or_default()),
             ..Default::default()
         }
         .save(db)
@@ -37,7 +37,7 @@ impl SettingService {
 
         setting::ActiveModel {
             id: setting.id,
-            device_id: Set(device_id),
+            device_id: Set(device_id.unwrap_or_default()),
             ..Default::default()
         }
         .update(db)

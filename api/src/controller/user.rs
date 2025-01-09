@@ -1,10 +1,11 @@
+use crate::middleware::auth::Auth;
 use crate::tools::{AppState, Params, ResponseData, ResponseStatus};
 use axum::{
     extract::{Path, Query, State},
     http::StatusCode,
     response::Json,
 };
-use service::{UserModel, UserServices};
+use service::{LoginModel, UserModel, UserServices};
 
 use serde_json::json;
 use serde_json::to_value;
@@ -92,5 +93,91 @@ impl UserController {
             "status": "success",
             "data": user
         })))
+    }
+
+    pub async fn create_admin_user(
+        state: State<AppState>,
+        Json(mut payload): Json<UserModel>,
+    ) -> Result<Json<serde_json::Value>, (StatusCode, &'static str)> {
+        // Check if email is empty
+        let password = match &payload.password {
+            Some(p) => p,
+            None => return Err((StatusCode::BAD_REQUEST, "Password is required")),
+        };
+
+        // Hash password
+        match Auth::hash_password(password) {
+            Ok(hashed_password) => {
+                payload.password = Some(hashed_password);
+            }
+            Err(_) => {
+                return Err((StatusCode::INTERNAL_SERVER_ERROR, "Failed to hash password"));
+            }
+        }
+
+        // Create admin user
+        UserServices::create_admin_user(&state.conn, payload)
+            .await
+            .map_err(|_| {
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Failed to create admin user",
+                )
+            })?;
+
+        Ok(Json(json!({
+            "status": "success",
+            "message": "Admin user created successfully"
+        })))
+    }
+
+    pub async fn login(
+        state: State<AppState>,
+        Json(mut payload): Json<LoginModel>,
+    ) -> Result<Json<serde_json::Value>, (StatusCode, &'static str)> {
+        let email = &payload.email;
+        let password = &payload.password;
+        // Check if email and password are empty
+        if email.is_empty() || password.is_empty() {
+            return Err((StatusCode::BAD_REQUEST, "Email and password are required"));
+        }
+
+        // Find user by email
+        let user = UserServices::find_user_by_email(&state.conn, email)
+            .await
+            .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Failed to find user"))?;
+
+        // Check if user is found
+        let user = user.unwrap();
+
+        // Check if password is found
+        let hashed_password = match &user.password {
+            Some(p) => p,
+            None => return Err((StatusCode::INTERNAL_SERVER_ERROR, "Password not found")),
+        };
+
+        // Verify password
+        match Auth::verify_password(password, hashed_password) {
+            Ok(is_valid) => {
+                if is_valid {
+                    // Generate JWT token
+                    let token = Auth::encode_jwt(email.to_string()).map_err(|_| {
+                        (StatusCode::INTERNAL_SERVER_ERROR, "Failed to encode token")
+                    })?;
+
+                    Ok(Json(json!({
+                        "status": "success",
+                        "message": "Login successful",
+                        "token": token
+                    })))
+                } else {
+                    Err((StatusCode::UNAUTHORIZED, "Invalid password"))
+                }
+            }
+            Err(_) => Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to verify password",
+            )),
+        }
     }
 }
