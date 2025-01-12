@@ -168,7 +168,8 @@ impl UserController {
                     Ok(Json(json!({
                         "status": "success",
                         "message": "Login successful",
-                        "token": token
+                        "token": token,
+                        "username":&user.name
                     })))
                 } else {
                     Err((StatusCode::UNAUTHORIZED, "Invalid password"))

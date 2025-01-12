@@ -1,8 +1,12 @@
+use std::sync::Arc;
+
 use axum::{
-    body::Body,
     extract::{Request, State},
-    http::{self, Response, StatusCode},
-    middleware::Next,
+    http::StatusCode,
+    middleware::{self, Next},
+    response::{IntoResponse, Response},
+    routing::get,
+    Router,
 };
 use bcrypt::{hash, verify, DEFAULT_COST};
 use chrono::{Duration, Utc};
@@ -32,53 +36,45 @@ pub struct Auth {
 
 impl Auth {
     pub async fn authorization_middleware(
-        State(state): State<AppState>,
+        state: State<AppState>,
         mut req: Request,
         next: Next,
-    ) -> Result<Response<Body>, AuthError> {
-        let auth_header = req.headers_mut().get(http::header::AUTHORIZATION);
+    ) -> Response {
+        let auth_header = req.headers_mut().get(axum::http::header::AUTHORIZATION);
+        // auth_header 轉字符串
         let auth_header = match auth_header {
-            Some(header) => header.to_str().map_err(|_| AuthError {
-                message: "Empty header is not allowed".to_string(),
-                status_code: StatusCode::FORBIDDEN,
-            })?,
+            Some(header) => header.to_str().unwrap(),
             None => {
-                return Err(AuthError {
-                    message: "Please add the JWT token to the header".to_string(),
-                    status_code: StatusCode::FORBIDDEN,
-                })
+                return Response::builder()
+                    .status(StatusCode::UNAUTHORIZED)
+                    .body(axum::body::Body::from("No authorization header provided"))
+                    .unwrap();
             }
         };
         let mut header = auth_header.split_whitespace();
         let (bearer, token) = (header.next(), header.next());
-        let token_data = match Self::decode_jwt(token.unwrap().to_string()) {
-            Ok(data) => data,
-            Err(_) => {
-                return Err(AuthError {
-                    message: "Unable to decode token".to_string(),
-                    status_code: StatusCode::UNAUTHORIZED,
-                })
-            }
-        };
-        // Fetch the user details from the database
+        let token_data = Self::decode_jwt(token.unwrap().to_string());
         let current_user =
-            match UserServices::find_user_by_email(&state.conn, &token_data.claims.email).await {
-                Ok(Some(user)) => user,
-                Ok(None) => {
-                    return Err(AuthError {
-                        message: "You are not an authorized user".to_string(),
-                        status_code: StatusCode::UNAUTHORIZED,
-                    })
-                }
-                Err(_) => {
-                    return Err(AuthError {
-                        message: "Database error".to_string(),
-                        status_code: StatusCode::INTERNAL_SERVER_ERROR,
-                    })
-                }
-            };
-        req.extensions_mut().insert(current_user);
-        Ok(next.run(req).await)
+            UserServices::find_user_by_email(&state.conn, &token_data.unwrap().claims.email).await;
+        match current_user {
+            Ok(Some(user)) => {
+                req.extensions_mut().insert(user);
+            }
+            Ok(None) => {
+                return Response::builder()
+                    .status(StatusCode::UNAUTHORIZED)
+                    .body(axum::body::Body::from("User not found"))
+                    .unwrap();
+            }
+            Err(_) => {
+                return Response::builder()
+                    .status(StatusCode::INTERNAL_SERVER_ERROR)
+                    .body(axum::body::Body::from("Internal server error"))
+                    .unwrap();
+            }
+        }
+        let response = next.run(req).await;
+        response
     }
 
     pub fn verify_password(password: &str, hash: &str) -> Result<bool, bcrypt::BcryptError> {

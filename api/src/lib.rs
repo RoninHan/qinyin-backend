@@ -14,7 +14,7 @@ use middleware::auth::Auth;
 use migration::{Migrator, MigratorTrait};
 use service::sea_orm::Database;
 
-use std::env;
+use std::{env, sync::Arc};
 use tera::Tera;
 use tower_cookies::CookieManagerLayer;
 use tower_http::services::ServeDir;
@@ -52,6 +52,11 @@ async fn start() -> anyhow::Result<()> {
     let state = AppState { templates, conn };
 
     let app = Router::new()
+        .route("/login", post(UserController::login))
+        .route(
+            "/create_admin_user",
+            post(UserController::create_admin_user),
+        )
         .route(
             "/user",
             get(UserController::list_users).layer(axum_middleware::from_fn_with_state(
@@ -59,28 +64,99 @@ async fn start() -> anyhow::Result<()> {
                 Auth::authorization_middleware,
             )),
         )
-        .route("/user/:id", get(UserController::get_user_by_id))
-        .route("/user/new", post(UserController::create_user))
-        .route("/user/update/:id", post(UserController::update_user))
-        .route("/user/delete/:id", delete(UserController::delete_user))
+        .route(
+            "/user/:id",
+            get(UserController::get_user_by_id).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
+        )
+        .route(
+            "/user/new",
+            post(UserController::create_user).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
+        )
+        .route(
+            "/user/update/:id",
+            post(UserController::update_user).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
+        )
+        .route(
+            "/user/delete/:id",
+            delete(UserController::delete_user).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
+        )
         .route("/song", get(SongController::list_songs))
-        .route("/song/new", post(SongController::create_song))
-        .route("/song/update/:id", post(SongController::update_song))
-        .route("/song/delete/:id", delete(SongController::delete_song))
+        .route(
+            "/song/new",
+            post(SongController::create_song).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
+        )
+        .route(
+            "/song/update/:id",
+            post(SongController::update_song).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
+        )
+        .route(
+            "/song/delete/:id",
+            delete(SongController::delete_song).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
+        )
         .route("/song_type", get(SongTypeController::list_song_types))
-        .route("/song_type/new", post(SongTypeController::create_song_type))
+        .route(
+            "/song_type/new",
+            post(SongTypeController::create_song_type).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
+        )
         .route(
             "/song_type/update/:id",
-            post(SongTypeController::update_song_type),
+            post(SongTypeController::update_song_type).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
         )
         .route(
             "/song_type/delete/:id",
-            delete(SongTypeController::delete_song_type),
+            delete(SongTypeController::delete_song_type).layer(
+                axum_middleware::from_fn_with_state(state.clone(), Auth::authorization_middleware),
+            ),
         )
-        .route("/score", get(ScoreController::list_scores))
+        .route(
+            "/score",
+            get(ScoreController::list_scores).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
+        )
         .route("/score/new", post(ScoreController::create_score))
-        .route("/score/update/:id", post(ScoreController::update_score))
-        .route("/score/delete/:id", delete(ScoreController::delete_score))
+        .route(
+            "/score/update/:id",
+            post(ScoreController::update_score).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
+        )
+        .route(
+            "/score/delete/:id",
+            delete(ScoreController::delete_score).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
+        )
         .route(
             "/score/get_globale_ranking/:id",
             get(ScoreController::get_globale_ranking),
@@ -90,21 +166,48 @@ async fn start() -> anyhow::Result<()> {
             get(ScoreController::get_friends_ranking),
         )
         .route("/lyrics", get(LyricsController::list_lyrics))
-        .route("/lyrics/new", post(LyricsController::create_lyrics))
-        .route("/lyrics/update/:id", post(LyricsController::update_lyrics))
+        .route(
+            "/lyrics/new",
+            post(LyricsController::create_lyrics).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
+        )
+        .route(
+            "/lyrics/update/:id",
+            post(LyricsController::update_lyrics).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
+        )
         .route(
             "/lyrics/delete/:id",
-            delete(LyricsController::delete_lyrics),
+            delete(LyricsController::delete_lyrics).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
         )
-        .route("/friends", get(FriendsController::list_friends))
+        .route(
+            "/friends",
+            get(FriendsController::list_friends).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
+        )
         .route("/friends/new", post(FriendsController::create_friends))
         .route(
             "/friends/update/:id",
-            post(FriendsController::update_friends),
+            post(FriendsController::update_friends).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
         )
         .route(
             "/friends/delete/:id",
-            delete(FriendsController::delete_friends),
+            delete(FriendsController::delete_friends).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
         )
         .route("/creation", get(CreationController::list_creations))
         .route("/creation/new", post(CreationController::create_creation))
@@ -114,17 +217,38 @@ async fn start() -> anyhow::Result<()> {
         )
         .route(
             "/creation/delete/:id",
-            delete(CreationController::delete_creation),
+            delete(CreationController::delete_creation).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
         )
         .route(
             "/creation/:id",
             get(CreationController::get_creation_by_user_id),
         )
         .route("/collect", get(CollectController::list_collects))
-        .route("/collect/new", post(CollectController::create_collect))
+        .route(
+            "/collect/new",
+            post(CollectController::create_collect).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
+        )
         .route("/setting", get(SettingController::list_settings))
-        .route("/setting/update", post(SettingController::update_setting))
-        .route("/setting/new", post(SettingController::update_setting))
+        .route(
+            "/setting/update",
+            post(SettingController::update_setting).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
+        )
+        .route(
+            "/setting/new",
+            post(SettingController::update_setting).layer(axum_middleware::from_fn_with_state(
+                state.clone(),
+                Auth::authorization_middleware,
+            )),
+        )
         .nest_service(
             "/static",
             get_service(ServeDir::new(concat!(
