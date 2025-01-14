@@ -64,6 +64,13 @@ impl LyricsService {
         Lyrics::find_by_id(id).one(db).await
     }
 
+    pub async fn find_lyrics_by_song_id(
+        db: &DbConn,
+        id: i32,
+    ) -> Result<Option<lyric::Model>, DbErr> {
+        Lyrics::find_by_id(id).one(db).await
+    }
+
     pub async fn find_lyrics(db: &DbConn) -> Result<Vec<lyric::Model>, DbErr> {
         Lyrics::find().all(db).await
     }
