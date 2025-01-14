@@ -237,13 +237,7 @@ async fn start() -> anyhow::Result<()> {
                 Auth::authorization_middleware,
             )),
         )
-        .route(
-            "/api/setting",
-            get(SettingController::list_settings).layer(axum_middleware::from_fn_with_state(
-                state.clone(),
-                Auth::authorization_middleware,
-            )),
-        )
+        .route("/api/setting", get(SettingController::list_settings))
         .route(
             "/api/setting/update/:id",
             post(SettingController::update_setting).layer(axum_middleware::from_fn_with_state(

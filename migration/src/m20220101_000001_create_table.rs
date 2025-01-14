@@ -76,6 +76,7 @@ impl MigrationTrait for Migration {
                             .timestamp_with_time_zone()
                             .not_null(),
                     )
+                    .col(ColumnDef::new(SongType::EnName).string())
                     .to_owned(),
             )
             .await?;
@@ -290,6 +291,7 @@ enum SongType {
     Name,
     CreatedAt,
     UpdatedAt,
+    EnName,
 }
 
 #[derive(DeriveIden)]

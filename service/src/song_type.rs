@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Deserialize, Serialize, Debug)]
 pub struct SongTypeModel {
     pub name: String,
+    pub en_name: Option<String>,
 }
 
 pub struct SongTypeService;
@@ -21,6 +22,7 @@ impl SongTypeService {
             name: Set(form_data.name.to_owned()),
             created_at: Set(DateTimeWithTimeZone::from(Utc::now())),
             updated_at: Set(DateTimeWithTimeZone::from(Utc::now())),
+            en_name: Set(form_data.en_name),
             ..Default::default()
         }
         .save(db)
@@ -41,6 +43,7 @@ impl SongTypeService {
         song_type::ActiveModel {
             id: song_type.id,
             name: Set(form_data.name.to_owned()),
+            en_name: Set(form_data.en_name),
             updated_at: Set(DateTimeWithTimeZone::from(Utc::now())),
             ..Default::default()
         }
