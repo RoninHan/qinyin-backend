@@ -93,6 +93,7 @@ async fn start() -> anyhow::Result<()> {
             )),
         )
         .route("/api/song", get(SongController::list_songs))
+        .route("/api/song/find_song_by_id/:id", get(SongController::find_song_by_id))
         .route(
             "/api/song/new",
             post(SongController::create_song).layer(axum_middleware::from_fn_with_state(
@@ -166,6 +167,7 @@ async fn start() -> anyhow::Result<()> {
             get(ScoreController::get_friends_ranking),
         )
         .route("/api/lyrics", get(LyricsController::list_lyrics))
+        .route("/api/lyrics/find_lyrics_by_song_id/:id", get(LyricsController::find_lyrics_by_song_id))
         .route(
             "/api/lyrics/new",
             post(LyricsController::create_lyrics).layer(axum_middleware::from_fn_with_state(

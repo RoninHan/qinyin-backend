@@ -67,4 +67,21 @@ impl LyricsController {
             "message": "Lyrics deleted successfully"
         })))
     }
+
+    pub async  fn find_lyrics_by_song_id(
+        state: State<AppState>,
+        Path(id): Path<i32>,
+    ) -> Result<Json<serde_json::Value>, (StatusCode, &'static str)> {
+        let lyricsdata = LyricsService::find_lyrics_by_song_id(&state.conn, id)
+            .await
+            .expect("Cannot find lyrics in page");
+
+        let data = ResponseData {
+            status: ResponseStatus::Success,
+            data: lyricsdata,
+        };
+        let json_data = to_value(data).unwrap();
+        println!("Json data: {:?}", json_data);
+        Ok(Json(json!(json_data)))
+    }
 }

@@ -68,7 +68,7 @@ impl LyricsService {
         db: &DbConn,
         id: i32,
     ) -> Result<Option<lyric::Model>, DbErr> {
-        Lyrics::find_by_id(id).one(db).await
+        Lyrics::find().filter(lyric::Column::SongId.eq(id as u32)).one(db).await
     }
 
     pub async fn find_lyrics(db: &DbConn) -> Result<Vec<lyric::Model>, DbErr> {

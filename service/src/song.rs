@@ -10,6 +10,7 @@ pub struct SongModel {
     pub author: String,
     pub song_type_id: i32,
     pub singer: String,
+    pub lyric:String
 }
 
 pub struct SongService;
